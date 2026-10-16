@@ -1,0 +1,59 @@
+[project]
+name = "crediflow-api"
+version = "0.1.0"
+description = "API da plataforma de operações de crédito CrediFlow"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.28",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+# ---------------------------------------------------------------- Ruff
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle (erros)
+    "W",     # pycodestyle (avisos)
+    "F",     # pyflakes: imports/variáveis não usados, nomes indefinidos
+    "I",     # isort: ordem de imports
+    "UP",    # pyupgrade: sintaxe moderna (list[int], X | None...)
+    "B",     # flake8-bugbear: armadilhas comuns
+    "SIM",   # flake8-simplify
+    "ASYNC", # flake8-async: chamadas bloqueantes dentro de async def
+    "N",     # pep8-naming
+]
+# B008: proíbe chamada de função em default de argumento — mas `Depends(...)`
+# do FastAPI é exatamente isso. Liberamos para não brigar com o framework.
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+# ---------------------------------------------------------------- Pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

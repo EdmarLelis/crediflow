@@ -1,0 +1,25 @@
+# Ambiente de desenvolvimento local. Credenciais fixas aqui são só para dev —
+# produção usa RDS com credenciais vindas de variáveis de ambiente.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: crediflow-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crediflow
+      POSTGRES_PASSWORD: crediflow
+      POSTGRES_DB: crediflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Scripts aqui rodam só na PRIMEIRA criação do volume (cria o banco de teste).
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crediflow -d crediflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
